@@ -61,7 +61,7 @@ export class SpotifyService extends IApiConnection {
         const response = await axios.get('https://api.spotify.com/v1/recommendations', {
             headers: { Authorization: `Bearer ${token}` },
             params: {
-                seed_artists: seedArtists.slice(0, 5).join(','),
+                seed_artists: (Array.isArray(seedArtists) ? seedArtists : [seedArtists]).slice(0, 5).join(','),
                 limit: 20,
                 market: 'BR',
             },
