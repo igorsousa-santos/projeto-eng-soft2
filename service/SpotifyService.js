@@ -68,4 +68,38 @@ export class SpotifyService extends IApiConnection {
         });
         return response.data.tracks ?? [];
     }
+
+    /**
+     * Exporta uma playlist para o Spotify do usuário.
+     * Cria a playlist e adiciona as tracks.
+     *
+     * @param {object} playlist - Objeto Playlist com getNome() e getMusicas()
+     * @param {string} token - Spotify Access Token do usuário
+     * @returns {boolean} true se exportou com sucesso
+     */
+    async exportarParaSpotify(playlist, token) {
+        const headers = { Authorization: `Bearer ${token}` };
+
+        // Cria a playlist no Spotify
+        const createResponse = await axios.post(
+            'https://api.spotify.com/v1/me/playlists',
+            { name: playlist.getNome(), public: false },
+            { headers },
+        );
+
+        const playlistId = createResponse.data.id;
+
+        // Adiciona as tracks à playlist
+        const musicas = playlist.getMusicas();
+        if (musicas && musicas.length > 0) {
+            const uris = musicas.map(m => m.getSpotifyUri?.() ?? `spotify:track:${m.getId?.()}`);
+            await axios.post(
+                `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+                { uris },
+                { headers },
+            );
+        }
+
+        return true;
+    }
 }

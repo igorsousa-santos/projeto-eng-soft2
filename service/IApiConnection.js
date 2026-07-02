@@ -20,4 +20,8 @@ export class IApiConnection {
     async obterRecomendacoes(usuarioId) {
         throw new Error('IApiConnection.obterRecomendacoes() não implementado');
     }
+
+    async exportarParaSpotify(playlist, token) {
+        throw new Error('IApiConnection.exportarParaSpotify() não implementado');
+    }
 }

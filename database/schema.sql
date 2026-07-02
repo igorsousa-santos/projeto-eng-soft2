@@ -54,3 +54,32 @@ VALUES
     ('Mestre Curador',       'Criou 10 playlists',                             10,  100),
     ('Lenda Musical',        'Alcançou o nível 8',                              8,  200)
 ON CONFLICT DO NOTHING;
+
+-- -------------------------------------------------------------
+-- Tabela: playlists
+-- -------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS playlists (
+    id          SERIAL PRIMARY KEY,
+    nome        VARCHAR(200) NOT NULL,
+    data        TIMESTAMP NOT NULL DEFAULT NOW(),
+    usuario_id  INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- -------------------------------------------------------------
+-- Tabela: musicas
+-- -------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS musicas (
+    id          SERIAL PRIMARY KEY,
+    titulo      VARCHAR(300) NOT NULL,
+    artista     VARCHAR(300),
+    spotify_id  VARCHAR(100)
+);
+
+-- -------------------------------------------------------------
+-- Tabela: playlist_musica (N:N – músicas de cada playlist)
+-- -------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS playlist_musica (
+    playlist_id INTEGER NOT NULL REFERENCES playlists(id) ON DELETE CASCADE,
+    musica_id   INTEGER NOT NULL REFERENCES musicas(id) ON DELETE CASCADE,
+    PRIMARY KEY (playlist_id, musica_id)
+);
