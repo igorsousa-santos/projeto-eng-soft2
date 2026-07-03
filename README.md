@@ -11,9 +11,9 @@ npm start
 
 Acesse: http://localhost:3000
 
-Requisitos: Node.js >= 16
+ou
 
- [ **Deploy no StackBlitz:**_](https://stackblitz.com/~/github.com/igorsousa-santos/projeto-eng-soft2)
+ [ **Deploy no StackBlitz**](https://stackblitz.com/~/github.com/igorsousa-santos/projeto-eng-soft2)
 
 ## Componentes do Grupo
 
