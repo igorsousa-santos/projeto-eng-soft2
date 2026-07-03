@@ -16,16 +16,12 @@ Requisitos: Node.js >= 16
 ## Links para Teste
 
 - **StackBlitz:** _TODO_
-- **GitHub:** _TODO_
 
 ## Componentes do Grupo
 
-| Nome | Matricula |
-|------|-----------|
-| _TODO_ | _TODO_ |
-| _TODO_ | _TODO_ |
-| _TODO_ | _TODO_ |
-| _TODO_ | _TODO_ |
+Guilherme da Silva Pereira
+Igor Sousa Santos
+
 
 ## Rotas REST Implementadas
 
