@@ -21,10 +21,11 @@ const config = {
     IRecomendacaoController: 'RecomendacaoController.js',
 
     // ── DAOs ────────────────────────────────────────────────
-    IUsuarioDAO:   'UsuarioDAO_Postgres.js',
-    IConquistaDAO: 'ConquistaDAO_Postgres.js',
-    IPlaylistDAO:  'PlaylistDAO_Postgres.js',
-    IMusicaDAO:    'MusicaDAO_Postgres.js',
+    // Para usar PostgreSQL, troque para *_Postgres.js
+    IUsuarioDAO:   'UsuarioDAO_InMemory.js',
+    IConquistaDAO: 'ConquistaDAO_InMemory.js',
+    IPlaylistDAO:  'PlaylistDAO_InMemory.js',
+    IMusicaDAO:    'MusicaDAO_InMemory.js',
 
     // ── Services ────────────────────────────────────────────
     ISpotifyService: 'SpotifyService.js',

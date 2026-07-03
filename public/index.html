@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusicHorizon - Login</title>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: 60px auto; padding: 0 15px; }
+        h1 { text-align: center; }
+        h2 { margin-top: 30px; }
+        input, button { padding: 6px 12px; margin: 3px 0; }
+        input { width: 100%; box-sizing: border-box; }
+        button { cursor: pointer; margin-top: 8px; }
+        .form-row { margin: 10px 0; }
+        .form-row label { display: block; margin-bottom: 3px; font-weight: bold; }
+        .msg { padding: 8px; margin: 10px 0; }
+        .msg.error { background: #fdd; border: 1px solid #c00; }
+        .msg.ok { background: #dfd; border: 1px solid #0a0; }
+        hr { margin: 30px 0; }
+        table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+        th, td { border: 1px solid #aaa; padding: 5px 8px; text-align: left; }
+        th { background: #ddd; }
+        .pick { cursor: pointer; color: blue; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>MusicHorizon</h1>
+
+    <h2>Entrar</h2>
+    <p>Selecione um usuario existente:</p>
+    <table id="tabelaUsuarios">
+        <thead><tr><th>ID</th><th>Login</th><th></th></tr></thead>
+        <tbody></tbody>
+    </table>
+    <button onclick="carregarUsuarios()">Atualizar lista</button>
+
+    <hr>
+
+    <h2>Cadastrar</h2>
+    <div class="form-row">
+        <label>Login:</label>
+        <input id="regLogin" placeholder="seu_login">
+    </div>
+    <div class="form-row">
+        <label>Last.fm Username (opcional):</label>
+        <input id="regLastfm" placeholder="lastfm_user">
+    </div>
+    <button onclick="registrar()">Cadastrar e Entrar</button>
+    <div id="msg" class="msg" hidden></div>
+
+    <script>
+        async function carregarUsuarios() {
+            const res = await fetch('/usuario');
+            const data = await res.json();
+            const tbody = document.querySelector('#tabelaUsuarios tbody');
+            tbody.innerHTML = '';
+            (data.usuarios || []).forEach(u => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td>' + u.id + '</td><td>' + u.login_usuario + '</td><td><span class="pick" onclick="entrar(' + u.id + ',\'' + u.login_usuario + '\')">Entrar</span></td>';
+                tbody.appendChild(tr);
+            });
+        }
+
+        function entrar(id, login) {
+            sessionStorage.setItem('userId', id);
+            sessionStorage.setItem('userLogin', login);
+            window.location.href = 'dashboard.html';
+        }
+
+        async function registrar() {
+            const login = document.getElementById('regLogin').value.trim();
+            if (!login) { showMsg('Preencha o login.', true); return; }
+            const res = await fetch('/usuario', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    loginUsuario: login,
+                    lastfmUsername: document.getElementById('regLastfm').value.trim() || null,
+                }),
+            });
+            const data = await res.json();
+            if (data.msgcode === 'SUCCESS') {
+                entrar(data.usuario.id, data.usuario.login_usuario || login);
+            } else {
+                showMsg('Erro: ' + (data.message || 'falha'), true);
+            }
+        }
+
+        function showMsg(text, isError) {
+            const el = document.getElementById('msg');
+            el.textContent = text;
+            el.className = 'msg ' + (isError ? 'error' : 'ok');
+            el.hidden = false;
+        }
+
+        carregarUsuarios();
+    </script>
+</body>
+</html>

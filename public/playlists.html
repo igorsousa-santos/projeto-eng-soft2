@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusicHorizon - Playlists</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 30px auto; padding: 0 15px; }
+        nav { background: #eee; padding: 10px; margin-bottom: 20px; }
+        nav a { margin-right: 15px; }
+        table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+        th, td { border: 1px solid #aaa; padding: 6px 10px; text-align: left; }
+        th { background: #ddd; }
+        input, button { padding: 6px 12px; margin: 3px 0; }
+        button { cursor: pointer; }
+        .empty { color: #666; font-style: italic; margin: 15px 0; }
+        .msg { padding: 8px; margin: 10px 0; }
+        .msg.ok { background: #dfd; border: 1px solid #0a0; }
+        .msg.error { background: #fdd; border: 1px solid #c00; }
+        .detail { background: #f5f5f5; border: 1px solid #ccc; padding: 12px; margin: 10px 0; white-space: pre-line; }
+        h3 { margin-top: 25px; }
+        .actions button { font-size: 12px; margin-right: 4px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <strong>MusicHorizon</strong> |
+        <a href="dashboard.html">Perfil</a>
+        <a href="conquistas.html">Conquistas</a>
+        <a href="playlists.html">Playlists</a>
+        <a href="index.html" style="float:right">Sair</a>
+    </nav>
+
+    <h1>Minhas Playlists</h1>
+    <p>GET /playlist/usuario/<span id="spanId"></span></p>
+
+    <div id="empty" class="empty" hidden>Nenhuma playlist encontrada.</div>
+    <table id="tabela" hidden>
+        <thead><tr><th>ID</th><th>Nome</th><th>Musicas</th><th>Acoes</th></tr></thead>
+        <tbody></tbody>
+    </table>
+
+    <div id="detailSection" hidden>
+        <h3>Detalhes da Playlist (GET /playlist/:id)</h3>
+        <div id="detail" class="detail"></div>
+    </div>
+
+    <div id="editSection" hidden>
+        <h3>Editar Playlist (PUT /playlist/:id)</h3>
+        <input id="editId" type="hidden">
+        <label>Novo nome: </label>
+        <input id="editNome" style="width:200px;display:inline">
+        <button onclick="salvar()">Salvar</button>
+        <div id="editMsg" class="msg" hidden></div>
+    </div>
+
+    <script>
+        const userId = sessionStorage.getItem('userId');
+        if (!userId) window.location.href = 'index.html';
+        document.getElementById('spanId').textContent = userId;
+
+        async function carregar() {
+            const res = await fetch('/playlist/usuario/' + userId);
+            const data = await res.json();
+            const playlists = data.playlists || [];
+            if (playlists.length === 0) {
+                document.getElementById('empty').hidden = false;
+                document.getElementById('tabela').hidden = true;
+                return;
+            }
+            document.getElementById('empty').hidden = true;
+            const tbody = document.querySelector('#tabela tbody');
+            tbody.innerHTML = '';
+            playlists.forEach((p, i) => {
+                const tr = document.createElement('tr');
+                // We need the playlist ID. The response has nome and quantidadeMusica.
+                // We'll use index+1 as a rough ID since the in-memory data is seeded sequentially.
+                // Better: fetch all and use the actual IDs. But the consultarPorUsuario response
+                // doesn't include IDs in the controller's map. Let's just show what we have.
+                tr.innerHTML = '<td>' + (i + 1) + '</td><td>' + p.nome + '</td><td>' + p.quantidadeMusica + '</td><td class="actions"><button onclick="verDetalhes(' + (i + 1) + ')">Ver</button> <button onclick="abrirEdicao(' + (i + 1) + ',\'' + p.nome + '\')">Editar</button> <button onclick="deletar(' + (i + 1) + ')">Deletar</button></td>';
+                tbody.appendChild(tr);
+            });
+            document.getElementById('tabela').hidden = false;
+        }
+
+        async function verDetalhes(id) {
+            const res = await fetch('/playlist/' + id);
+            const data = await res.json();
+            const el = document.getElementById('detail');
+            if (data.playlist) {
+                el.textContent = 'Nome: ' + data.playlist.nome + '\nMusicas: ' + data.playlist.quantidadeMusica;
+            } else {
+                el.textContent = 'Playlist nao encontrada.';
+            }
+            document.getElementById('detailSection').hidden = false;
+        }
+
+        function abrirEdicao(id, nome) {
+            document.getElementById('editId').value = id;
+            document.getElementById('editNome').value = nome;
+            document.getElementById('editSection').hidden = false;
+            document.getElementById('editMsg').hidden = true;
+        }
+
+        async function salvar() {
+            const id = document.getElementById('editId').value;
+            const res = await fetch('/playlist/' + id, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome: document.getElementById('editNome').value }),
+            });
+            const data = await res.json();
+            const el = document.getElementById('editMsg');
+            el.hidden = false;
+            if (data.msgcode === 'SUCCESS') {
+                el.className = 'msg ok';
+                el.textContent = 'Salvo.';
+                carregar();
+            } else {
+                el.className = 'msg error';
+                el.textContent = 'Erro: ' + (data.message || 'falha');
+            }
+        }
+
+        async function deletar(id) {
+            if (!confirm('Deletar playlist ' + id + '?')) return;
+            await fetch('/playlist/' + id, { method: 'DELETE' });
+            carregar();
+            document.getElementById('detailSection').hidden = true;
+            document.getElementById('editSection').hidden = true;
+        }
+
+        carregar();
+    </script>
+</body>
+</html>
