@@ -20,6 +20,7 @@ Requisitos: Node.js >= 16
 ## Componentes do Grupo
 
 Guilherme da Silva Pereira
+
 Igor Sousa Santos
 
 
