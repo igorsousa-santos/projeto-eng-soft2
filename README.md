@@ -13,9 +13,7 @@ Acesse: http://localhost:3000
 
 Requisitos: Node.js >= 16
 
-## Links para Teste
-
-- **StackBlitz:** _TODO_
+ [ **Deploy no StackBlitz:**_](https://stackblitz.com/~/github.com/igorsousa-santos/projeto-eng-soft2)
 
 ## Componentes do Grupo
 
@@ -24,7 +22,7 @@ Guilherme da Silva Pereira
 Igor Sousa Santos
 
 
-## Rotas REST Implementadas
+## Rotas Implementadas
 
 ### Usuario (/usuario)
 
